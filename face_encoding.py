@@ -9,7 +9,7 @@ face_encoder = dlib.face_recognition_model_v1('dlib-models/dlib_face_recognition
 shape_predictor = dlib.shape_predictor('dlib-models/shape_predictor_68_face_landmarks.dat')
 
 
-def get_encod(img:str):
+def get_encod(img: str):
     img = np.array(Image.open(img).convert('RGB'))
     face_rectangle = face_detector(img, 1)
     landmarks = shape_predictor(img, face_rectangle[0])
