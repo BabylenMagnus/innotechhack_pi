@@ -1,6 +1,8 @@
 import dlib
 import numpy as np
 from PIL import Image
+import requests
+from io import BytesIO
 
 
 face_detector = dlib.get_frontal_face_detector()
@@ -12,6 +14,14 @@ shape_predictor = dlib.shape_predictor('dlib-models/shape_predictor_68_face_land
 load_img = lambda x: np.array(Image.open(x).convert('RGB'))
 
 
+def url_to_img(url: str):
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+    return np.array(img)
+
+vector_to_str = lambda arr: ', '.join(str(x) for x in arr)
+
+
 def get_encod(img):
     if isinstance(img, str):
         img = load_img(img)
@@ -19,3 +29,5 @@ def get_encod(img):
     landmarks = shape_predictor(img, face_rectangle[0])
     embedding = face_encoder.compute_face_descriptor(img, landmarks, num_jitters=10)
     return np.asarray(embedding)
+
+
