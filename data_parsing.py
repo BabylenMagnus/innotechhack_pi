@@ -43,6 +43,7 @@ translit_map = {
 
 translit = lambda x: ''.join([translit_map[j] for j in x])
 vector_to_str = lambda arr: ', '.join(str(x) for x in arr)
+vector_to_list = lambda arr: list(float(x) for x in arr)
 
 extremist = pd.read_csv('extremists.csv')
 
@@ -70,14 +71,14 @@ def add_encoding(data):
 
     try:
         encod = get_encod(img)
-        embedding_db.insert_one({full_name: vector_to_str(encod)})
+        embedding_db.insert_one({full_name: vector_to_list(encod)})
     except Exception:
         images = vk.get_profile_photos(data['id'])
         for img in images:
             try:
                 img = url_to_img(img)
                 encod = get_encod(img)
-                embedding_db.insert_one({full_name: vector_to_str(encod)})
+                embedding_db.insert_one({full_name: vector_to_list(encod)})
                 break
             except Exception:
                 continue

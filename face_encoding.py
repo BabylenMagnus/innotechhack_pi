@@ -19,7 +19,9 @@ def url_to_img(url: str):
     img = Image.open(BytesIO(response.content))
     return np.array(img)
 
+
 vector_to_str = lambda arr: ', '.join(str(x) for x in arr)
+vector_to_list = lambda arr: list(float(x) for x in arr)
 
 
 def get_encod(img):
