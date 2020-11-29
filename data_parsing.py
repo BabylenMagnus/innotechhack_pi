@@ -3,6 +3,8 @@ import pymongo
 from const import *
 from face_encoding import get_encod, url_to_img
 import vk
+from parse_nalog import get_ogrn_inn
+
 
 translit_map = {
     "а": "a",
@@ -62,6 +64,7 @@ client = pymongo.MongoClient(MONGO_URL)
 db = client.inno_hack
 embedding_db = db['embedding']
 vk_db = db['raw_vk']
+ohter = db['other']
 
 
 def clean_data(data):
@@ -77,6 +80,10 @@ def add_encoding(data):
     img = url_to_img(data['photo_max_orig'])
     data = clean_data(data)
     data['name'] = full_name
+    a = get_ogrn_inn(data['first_name'] + ' ' + data['last_name'])
+    if a is not None:
+        ogrn, inn = a
+        ohter.insert_one({'name': full_name, 'inn': inn, 'ogrn': ogrn})
     vk_db.insert_one(data)
     try:
         encod = get_encod(img)
@@ -96,4 +103,3 @@ def add_encoding(data):
 def input_encoder(vk_url):
     test = vk.get_users_data([vk_url.split('/')[-1]])
     add_encoding(test['response'][0])
-
