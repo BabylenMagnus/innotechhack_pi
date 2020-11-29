@@ -33,3 +33,4 @@ def get_encod(img):
     return np.asarray(embedding)
 
 
+distance = lambda a, b: np.linalg.norm(a - b)

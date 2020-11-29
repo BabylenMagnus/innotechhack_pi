@@ -61,24 +61,39 @@ def is_terrorist(name, birh=None):
 client = pymongo.MongoClient(MONGO_URL)
 db = client.inno_hack
 embedding_db = db['embedding']
+vk_db = db['raw_vk']
+
+
+def clean_data(data):
+    new_data = {}
+    for keys, value in data.items():
+        if value != '':
+            new_data[keys] = value
+    return new_data
 
 
 def add_encoding(data):
     full_name = translit((data['first_name'] + ' ' + data['last_name']).lower())
-
-    data[full_name] = {}
     img = url_to_img(data['photo_max_orig'])
-
+    data = clean_data(data)
+    data['name'] = full_name
+    vk_db.insert_one(data)
     try:
         encod = get_encod(img)
-        embedding_db.insert_one({full_name: vector_to_list(encod)})
+        embedding_db.insert_one({'embedding': vector_to_list(encod), 'name': full_name})
     except Exception:
         images = vk.get_profile_photos(data['id'])
         for img in images:
             try:
                 img = url_to_img(img)
                 encod = get_encod(img)
-                embedding_db.insert_one({full_name: vector_to_list(encod)})
+                embedding_db.insert_one({'embedding': vector_to_list(encod), 'name': full_name})
                 break
             except Exception:
                 continue
+
+
+def input_encoder(vk_url):
+    test = vk.get_users_data([vk_url.split('/')[-1]])
+    add_encoding(test['response'][0])
+
